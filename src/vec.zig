@@ -8,6 +8,94 @@ pub fn Vectors(comptime Element: type, comptime impl: Implementation(Element)) t
         // 2-dimensional vector data.
         pub const Vec2 = struct {
             data: @Vector(2, Element),
+
+            /// The zero vector.
+            pub const zero = splat(0);
+
+            /// The one vector.
+            pub const one = splat(1);
+
+            /// Add this vector with another vector.
+            pub inline fn add(self: Vec2, other: Vec2) Vec2 {
+                return .{ .data = impl.vec2_add(self.data, other.data) };
+            }
+
+            /// If the vector is approximately equal to another one.
+            pub inline fn approxEql(self: Vec2, other: Vec2, max_error_per_elem: Element) bool {
+                return impl.vec2_approx_eql(self.data, other.data, max_error_per_elem);
+            }
+
+            /// Create a vector that is a direction and magnitude from this as a point to another point.
+            pub inline fn createVecTo(self: Vec2, other: Vec2) Vec2 {
+                return other.sub(self);
+            }
+
+            /// Divide this vector by an element.
+            pub inline fn div(self: Vec2, other: Element) Vec2 {
+                return .{ .data = impl.vec2_div(self.data, other) };
+            }
+
+            /// Dot this vector with another vector.
+            pub inline fn dot(self: Vec2, other: Vec2) Element {
+                return impl.vec2_dot(self.data, other.data);
+            }
+
+            /// If this vector is equal to another vector.
+            pub inline fn eql(self: Vec2, other: Vec2) bool {
+                return @reduce(.And, self.data == other.data);
+            }
+
+            /// Get the length of this vector (magnitude) and normalize this vector all in one go.
+            pub inline fn getLenAndNormalizeSelf(self: *Vec2) Element {
+                const length = self.len();
+                self.* = self.normalize();
+                return length;
+            }
+
+            /// Get the length of this vector (magnitude).
+            pub inline fn len(self: Vec2) Element {
+                return impl.vec2_len(self.data);
+            }
+
+            /// Get the squared length of this vector (equivalent to the dot product with itself).
+            pub inline fn lenSquared(self: Vec2) Element {
+                return impl.vec2_len_squared(self.data);
+            }
+
+            /// Multiply this vector with another vector, then add another vector after with one operation.
+            pub inline fn mad(self: Vec2, other_mul: Element, other_add: Vec2) Vec2 {
+                return .{ .data = impl.vec2_mad(self.data, other_mul, other_add.data) };
+            }
+
+            /// Multiply this vector by an element.
+            pub inline fn mul(self: Vec2, other: Element) Vec2 {
+                return .{ .data = impl.vec2_mul(self.data, other) };
+            }
+
+            /// Make this vector unit-length (magnitude of one).
+            pub inline fn normalize(self: Vec2) Vec2 {
+                return .{ .data = impl.vec2_normalize(self.data) };
+            }
+
+            /// Get a vector perpendicular to this one.
+            pub inline fn perpendicularWithNewXNeg(self: Vec2) Vec2 {
+                return .{ .data = [_]Element{ -self.data[1], self.data[0] } };
+            }
+
+            /// Get a vector perpendicular to this one.
+            pub inline fn perpendicularWithNewYNeg(self: Vec2) Vec2 {
+                return .{ .data = [_]Element{ self.data[1], -self.data[0] } };
+            }
+
+            /// Create a vector with all elements initialized to the same value.
+            pub inline fn splat(val: Element) Vec2 {
+                return .{ .data = @splat(val) };
+            }
+
+            /// Subtract from this vector with another vector.
+            pub inline fn sub(self: Vec2, other: Vec2) Vec2 {
+                return .{ .data = impl.vec2_sub(self.data, other.data) };
+            }
         };
 
         // 3-dimensional vector data.
@@ -55,6 +143,13 @@ pub fn Vectors(comptime Element: type, comptime impl: Implementation(Element)) t
                 return @reduce(.And, self.data == other.data);
             }
 
+            /// Get the length of this vector (magnitude) and normalize this vector all in one go.
+            pub inline fn getLenAndNormalizeSelf(self: *Vec2) Element {
+                const length = self.len();
+                self.* = self.normalize();
+                return length;
+            }
+
             /// Get the length of this vector (magnitude).
             pub inline fn len(self: Vec3) Element {
                 return impl.vec3_len(self.data);
@@ -90,6 +185,11 @@ pub fn Vectors(comptime Element: type, comptime impl: Implementation(Element)) t
                 return .{ .data = impl.vec3_sub(self.data, other.data) };
             }
         };
+
+        /// Create a new 2-dimensional vector.
+        pub inline fn vec2(x: Element, y: Element) Vec3 {
+            return .{ .data = .{ x, y } };
+        }
 
         /// Create a new 3-dimensional vector.
         pub inline fn vec3(x: Element, y: Element, z: Element) Vec3 {

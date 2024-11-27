@@ -6,6 +6,47 @@ fn BuiltinImplementationFloat(comptime Element: type) type {
         const Vec2 = @Vector(2, Element);
         const Vec3 = @Vector(3, Element);
 
+        inline fn vec2_add(a: Vec2, b: Vec2) Vec2 {
+            return a + b;
+        }
+
+        inline fn vec2_approx_eql(a: Vec2, b: Vec2, c: Element) bool {
+            const diff = a - b;
+            return @reduce(.Min, @as(Vec2, @splat(c)) - @abs(diff)) >= 0;
+        }
+
+        inline fn vec2_div(a: Vec2, b: Element) Vec2 {
+            return a / @as(Vec2, @splat(b));
+        }
+
+        inline fn vec2_dot(a: Vec2, b: Vec2) Element {
+            return @reduce(.Add, a * b);
+        }
+
+        inline fn vec2_len(a: Vec2) Element {
+            return @sqrt(@reduce(.Add, a * a));
+        }
+
+        inline fn vec2_len_squared(a: Vec2) Element {
+            return @reduce(.Add, a * a);
+        }
+
+        inline fn vec2_mad(a: Vec2, b: Element, c: Vec2) Vec2 {
+            return @mulAdd(Vec2, a, @splat(b), c);
+        }
+
+        inline fn vec2_mul(a: Vec2, b: Element) Vec2 {
+            return a * @as(Vec2, @splat(b));
+        }
+
+        inline fn vec2_normalize(a: Vec2) Vec2 {
+            return a / @as(Vec2, @splat(@sqrt(@reduce(.Add, a * a))));
+        }
+
+        inline fn vec2_sub(a: Vec2, b: Vec2) Vec2 {
+            return a - b;
+        }
+
         inline fn vec3_add(a: Vec3, b: Vec3) Vec3 {
             return a + b;
         }
@@ -60,6 +101,17 @@ fn BuiltinImplementationFloat(comptime Element: type) type {
 pub fn builtinImplementationFloat(comptime Element: type) Implementation(Element) {
     const impl = BuiltinImplementationFloat(Element);
     return .{
+        .vec2_add = impl.vec2_add,
+        .vec2_approx_eql = impl.vec2_approx_eql,
+        .vec2_div = impl.vec2_div,
+        .vec2_dot = impl.vec2_dot,
+        .vec2_len = impl.vec2_len,
+        .vec2_len_squared = impl.vec2_len_squared,
+        .vec2_mad = impl.vec2_mad,
+        .vec2_mul = impl.vec2_mul,
+        .vec2_normalize = impl.vec2_normalize,
+        .vec2_sub = impl.vec2_sub,
+
         .vec3_add = impl.vec3_add,
         .vec3_approx_eql = impl.vec3_approx_eql,
         .vec3_cross = impl.vec3_cross,
